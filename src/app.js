@@ -2,12 +2,9 @@ const express = require("express");
 
 const app = express();
 
-app.use("/test", (req, res) => {
-  res.send("test");
-});
-
-app.use("/", (req, res) => {
-  res.send("hello from port 3000...");
+app.get("/user/:userId", (req, res) => {
+  console.log(req.params);
+  res.send(`user is here ${req.params.userId}`);
 });
 
 app.listen(3000, () => {
