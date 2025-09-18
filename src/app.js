@@ -5,6 +5,30 @@ const User = require("./models/user");
 
 app.use(express.json());
 
+// get all users
+app.get("/feed", async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    res.status(400).send("something went wrong ", err.message);
+  }
+});
+
+// find user by email
+app.get("/user", async (req, res) => {
+  const userEmail = req.body.email;
+  try {
+    const usersDetail = await User.find({ email: userEmail });
+    if (usersDetail.length === 0) {
+      res.status(400).send("No matching user found");
+    }
+  } catch (err) {
+    res.status(400).send("somthing went wrong ", err.message);
+  }
+});
+
+// create a user
 app.post("/signup", async (req, res) => {
   const userObj = new User(req.body);
 
@@ -12,7 +36,35 @@ app.post("/signup", async (req, res) => {
     await userObj.save();
     res.send("user created successfully");
   } catch (err) {
-    res.status(400).send("failed to save", err.message);
+    res.status(400).send("failed to save ", err.message);
+  }
+});
+
+//delete a user
+app.delete("/delete", async (req, res) => {
+  const userId = req.body.userId;
+  try {
+    await User.findOneAndDelete(userId);
+    res.send("successfully deleted the user");
+  } catch (err) {
+    res.status(400).send("failed to delete");
+  }
+});
+
+//update a user
+app.patch("/update", async (req, res) => {
+  const userId = req.body.userId;
+  const data = req.body;
+  try {
+    const op = await User.findByIdAndUpdate(userId, data, {
+      returnDocument: "after",
+    });
+    console.log("res", op);
+    res.send("user updated");
+  } catch (err) {
+    console.log(err.message);
+
+    res.status(400).send("Failed to update the user", err);
   }
 });
 
