@@ -56,6 +56,18 @@ app.patch("/update", async (req, res) => {
   const userId = req.body.userId;
   const data = req.body;
   try {
+    const ALLOWED_UPDATE = ["gender", "about", "skills"];
+    const isAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATE.includes(k)
+    );
+
+    if (!isAllowed) {
+      throw new Error("Update not allowed");
+    }
+
+    if (data?.skills.length > 0) {
+      throw new Error("max 10 skills can be added");
+    }
     const op = await User.findByIdAndUpdate(userId, data, {
       returnDocument: "after",
       runValidators: true,
