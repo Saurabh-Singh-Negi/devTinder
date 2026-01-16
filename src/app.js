@@ -15,11 +15,11 @@ app.get("/feed", async (req, res) => {
   }
 });
 
-// find user by email
+// find user by emailId
 app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
+  const userEmail = req.body.emailId;
   try {
-    const usersDetail = await User.find({ email: userEmail });
+    const usersDetail = await User.find({ emailId: userEmail });
     if (usersDetail.length === 0) {
       res.status(400).send("No matching user found");
     }
@@ -36,7 +36,7 @@ app.post("/signup", async (req, res) => {
     await userObj.save();
     res.send("user created successfully");
   } catch (err) {
-    res.status(400).send("failed to save ", err.message);
+    res.status(400).send(err.message);
   }
 });
 
@@ -58,13 +58,14 @@ app.patch("/update", async (req, res) => {
   try {
     const op = await User.findByIdAndUpdate(userId, data, {
       returnDocument: "after",
+      runValidators: true,
     });
     console.log("res", op);
     res.send("user updated");
   } catch (err) {
     console.log(err.message);
 
-    res.status(400).send("Failed to update the user", err);
+    res.status(400).send("Failed to update the user " + err);
   }
 });
 
